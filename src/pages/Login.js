@@ -1,14 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../services/api'
 
 import { KeyboardAvoidingView, AsyncStorage, View, Platform, Image, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 
 import logo from '../../assets/logo.png'
 
-export default function Login() {
+export default function Login({navigation}) {
     const [email, setEmail] = useState('')
     const [techs, setTechs] = useState('')
-
+    useEffect(() => {
+        AsyncStorage.getItem('user').then( user => {
+            if (user) {
+                navigation.navigate('List')
+            }
+        })
+    }, [])
 
     async function handleSubmit() {
         const response = await api.post('/sessions', {
@@ -19,6 +25,8 @@ export default function Login() {
 
         await AsyncStorage.setItem('user', _id);
         await AsyncStorage.setItem('tecnologias',techs)
+
+        navigation.navigate('List')
     }
 
     return (

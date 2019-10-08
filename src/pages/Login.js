@@ -1,9 +1,26 @@
-import React from 'react';
-import { KeyboardAvoidingView, View, Platform, Image, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import api from '../services/api'
+
+import { KeyboardAvoidingView, AsyncStorage, View, Platform, Image, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 
 import logo from '../../assets/logo.png'
 
 export default function Login() {
+    const [email, setEmail] = useState('')
+    const [techs, setTechs] = useState('')
+
+
+    async function handleSubmit() {
+        const response = await api.post('/sessions', {
+            email
+        })
+
+        const { _id } = response.data
+
+        await AsyncStorage.setItem('user', _id);
+        await AsyncStorage.setItem('tecnologias',techs)
+    }
+
     return (
         <KeyboardAvoidingView enabled={Platform.OS === 'ios'} behavior="padding" style={styles.container}>
             <Image source={logo} />
@@ -18,7 +35,8 @@ export default function Login() {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoCorrect={false}
-                
+                value={email}
+                onChangeText={setEmail}
                 />
                 <Text style={styles.label}>TECNOLOGIAS *</Text>
 
@@ -28,10 +46,15 @@ export default function Login() {
                 placeholderTextColor="#999"
                 autoCapitalize="words"
                 autoCorrect={false}
-                
+                value={techs}
+                onChangeText={setTechs}
                 />
-                <TouchableOpacity style={styles.button}>
-                    <Text style={styles.buttonText} >Encontrar Spots</Text>
+                <TouchableOpacity 
+                style={styles.button} 
+                onPress={handleSubmit}
+                >
+                    <Text 
+                    style={styles.buttonText} >Encontrar Spots</Text>
                 </TouchableOpacity>
             </View>
         </KeyboardAvoidingView>
